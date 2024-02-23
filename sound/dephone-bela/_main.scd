@@ -32,10 +32,10 @@ SerialPort.devices().postln();
         "1 - example a.wav",
         "1 - example b.wav"
     ],
+    [],
     [
         "1 - example countdown.wav"
     ],
-    []
 ]
 
 s.waitForBoot {
@@ -53,11 +53,11 @@ s.waitForBoot {
      *  Set up synths
      **/
     SynthDef("stream-buf", {
-        arg out = 0, bufnum;
+        arg out = 0, bufnum, shouldLoop = 0;
 
         Out.ar(
             out,
-            DiskIn.ar(2, bufnum)
+            DiskIn.ar(2, bufnum, loop: shouldLoop)
         );
     }).add;
 
@@ -71,7 +71,7 @@ s.waitForBoot {
 				~examplePlayer.free;
 			});
 			~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf], s);
+            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf, \shouldLoop, 1], s);
         });
 
         // TODO: phase 2
