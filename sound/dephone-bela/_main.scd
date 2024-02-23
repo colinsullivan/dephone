@@ -27,6 +27,16 @@ s.options.numOutputBusChannels = 2;
 SerialPort.devices().postln();
 ~portName = "/dev/ttyACM0";
 
+~experienceSoundsByPhase = [
+    [
+        "1 - example a.wav",
+        "1 - example b.wav"
+    ],
+    [
+        "1 - example countdown.wav"
+    ],
+    []
+]
 
 s.waitForBoot {
 	var buffer = "";
@@ -60,16 +70,18 @@ s.waitForBoot {
 			if (~examplePlayer.isNil == false, {
 				~examplePlayer.free;
 			});
-			~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ "1 - example a.wav", 0, 2);
+			~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
             ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf], s);
         });
 
-        if(~experiencePhase == 1, {
+        // TODO: phase 2
+
+        if(~experiencePhase == 2, {
             if (~examplePlayer.isNil == false, {
                 ~examplePlayer.free;
             });
-            ~exampleCountdownBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ "1 - example countdown.wav", 0, 2);
-            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleCountdownBuf], s);
+			~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
+            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf], s);
         });
     };
     ~advancePhaseState = {
