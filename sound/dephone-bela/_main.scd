@@ -18,14 +18,30 @@ s.options.blockSize = 16;
 s.options.numInputBusChannels = 2;
 s.options.numOutputBusChannels = 2;
 
+/**
+ *  Config
+ **/
+// ~soundDir = "/root/Bela/projects/dephone-sounds";
+~soundDir = "/Users/colin/Projects/dephone/sound";
+
+SerialPort.devices().postln();
+~portName = "/dev/ttyACM0";
+
+
 s.waitForBoot {
 	var buffer = "";
-	// Your code goes here.
-	b = Buffer.read(s, Platform.resourceDir +/+ "sounds/a11wlk01.wav");
 
-    SerialPort.devices().postln();
-    ~portName = "/dev/ttyACM0";
+	/**
+	* Tracks phase of experience
+	**/
+	// 0. approach, scans QR, getting instructions, place phone down
+	// 1. holding buttons
+	// 2. door opens, person is dephoned, countdown
+	~experiencePhase = 0;
 
+    /**
+     *  Set up synths
+     **/
     SynthDef("stream-buf", {
         arg out = 0, bufnum;
 
@@ -35,13 +51,43 @@ s.waitForBoot {
         );
     }).add;
 
-    ~soundDir = "/root/Bela/projects/dephone-sounds";
-    ~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ "1 - example a.wav", 0, 2);
+    /**
+     *  Sets up state machine
+     **/
+    ~handlePhaseAdvanced = {
+		~experiencePhase.postln();
+        if(~experiencePhase == 0, {
+			if (~examplePlayer.isNil == false, {
+				~examplePlayer.free;
+			});
+			~exampleABuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ "1 - example a.wav", 0, 2);
+            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf], s);
+        });
 
-    ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleABuf], s);
+        if(~experiencePhase == 1, {
+            if (~examplePlayer.isNil == false, {
+                ~examplePlayer.free;
+            });
+            ~exampleCountdownBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ "1 - example countdown.wav", 0, 2);
+            ~examplePlayer = Synth.new("stream-buf", [\bufnum, ~exampleCountdownBuf], s);
+        });
+    };
+    ~advancePhaseState = {
+        ~experiencePhase = (~experiencePhase + 1) % 3;
+		~experiencePhase.postln();
+		~handlePhaseAdvanced.value();
+    };
+
+    /**
+     *  handles phase advanced the first time
+     **/
+    ~handlePhaseAdvanced.value();
 
     ~arduino = SerialPort(~portName, 9600, crtscts: true);
 
+    /**
+     *  Read arduino
+     **/
     ~processData = {
         arg data;
 
