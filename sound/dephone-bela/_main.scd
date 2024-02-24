@@ -95,6 +95,9 @@ s.waitForBoot {
      **/
     ~handlePhaseAdvanced.value();
 
+    /**
+     *  Intializes arduino serial connection
+     **/
     ~arduino = SerialPort(~portName, 9600, crtscts: true);
 
     /**
@@ -106,13 +109,11 @@ s.waitForBoot {
         buffer = buffer ++ data.asAscii;
 
         if(buffer.endsWith("BD")) {
-        ~player = {
-            BufRd.ar(1, b, SinOsc.ar(0.08) * BufFrames.ir(b))
-        }.play;
-        buffer = "";
+            "BD".postln();
+            buffer = "";
         } {
             if (buffer.endsWith("BU")) {
-                ~player.free();
+                "BU".postln();
                 buffer = "";
             }
 
