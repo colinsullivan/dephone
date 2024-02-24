@@ -21,8 +21,8 @@ s.options.numOutputBusChannels = 2;
 /**
  *  Config
  **/
-// ~soundDir = "/root/Bela/projects/dephone-sounds";
-~soundDir = "/Users/colin/Projects/dephone/sound";
+~soundDir = "/root/Bela/projects/dephone-sounds";
+//~soundDir = "/Users/colin/Projects/dephone/sound";
 
 SerialPort.devices().postln();
 ~portName = "/dev/ttyACM0";
@@ -98,7 +98,7 @@ s.waitForBoot {
 				~musicPlayer.free;
 			});
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-            ~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \shouldLoop, 1], s);
+            ~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \shouldLoop, 1, \amp, -4.dbamp()], s);
         });
 
         if(~experiencePhase == 1, {
