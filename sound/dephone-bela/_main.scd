@@ -53,7 +53,7 @@ SerialPort.devices().postln();
     "voices-rendered-03 [2024-02-23 200945].aif",
     "voices-rendered-04 [2024-02-23 200945].aif",
     "voices-rendered-05 [2024-02-23 200945].aif",
-    "voices-rendered-06 [2024-02-23 200945].aif",
+    "voices-rendered-06 [2024-02-23 200944].aif",
     "voices-rendered-07 [2024-02-23 200945].aif",
 ];
 
@@ -110,7 +110,7 @@ s.waitForBoot {
 			~transitionBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
             ~transitionPlayer = Synth.new("stream-buf", [\bufnum, ~transitionBuf, \shouldLoop, 0], s);
 
-            // Automatically advance in 11 seconds
+            // Automatically advance in 7 bars
 			TempoClock.default.sched(7 * beatsPerBar, {
 				~advancePhaseState.value();
 			});
@@ -123,9 +123,17 @@ s.waitForBoot {
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
 			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf], s);
 
-			// TODO: schedule voices
+            TempoClock.default.sched((beatsPerBar * 4).rand(beatsPerBar * 12), {
+                ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
+                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0], s);
+            });
 
-			// schedule transition to next phase
+            TempoClock.default.sched((beatsPerBar * 24).rand(beatsPerBar * 32), {
+                ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
+                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0], s);
+            });
+
+			// schedule transition to next phase in 41 bars
 			TempoClock.default.sched(41 * beatsPerBar, {
 				~advancePhaseState.value();
 			});
