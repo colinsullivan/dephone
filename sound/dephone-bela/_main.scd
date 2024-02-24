@@ -21,12 +21,12 @@ s.options.numOutputBusChannels = 2;
 /**
  *  Config
  **/
-// ~soundDir = "/root/Bela/projects/dephone-sounds";
-~soundDir = "/Users/colin/Projects/dephone/sound";
+ ~soundDir = "/root/Bela/projects/dephone-sounds";
+//~soundDir = "/Users/colin/Projects/dephone/sound";
 
 SerialPort.devices().postln();
-//~portName = "/dev/ttyACM0";
-~portName = "/dev/cu.usbmodem11201";
+~portName = "/dev/ttyACM0";
+//~portName = "/dev/cu.usbmodem11201";
 
 ~experienceSoundsByPhase = [
     [
