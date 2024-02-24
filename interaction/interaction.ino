@@ -12,7 +12,7 @@ unsigned long kCountdownDurationMs = 60000;
 void setup() {
     // initialize the LED pin as an output:
     // initialize the pushbutton pin as an input:
-    pinMode(buttonPin, INPUT);
+    pinMode(buttonPin, INPUT_PULLUP);
 
     // Initialize serial communication at 9600 bits per second:
     Serial.begin(9600);
@@ -83,7 +83,7 @@ void loop() {
     buttonState = digitalRead(buttonPin);
 
     if (prevButtonState != buttonState) {
-        if (buttonState == HIGH) {
+        if (buttonState == LOW) {
             handleButtonPress();
         }
     }
