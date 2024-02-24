@@ -25,7 +25,8 @@ s.options.numOutputBusChannels = 2;
 ~soundDir = "/Users/colin/Projects/dephone/sound";
 
 SerialPort.devices().postln();
-~portName = "/dev/ttyACM0";
+//~portName = "/dev/ttyACM0";
+~portName = "/dev/cu.usbmodem11201";
 
 ~experienceSoundsByPhase = [
     [
@@ -164,15 +165,10 @@ s.waitForBoot {
 
         buffer = buffer ++ data.asAscii;
 
-        if(buffer.endsWith("BD")) {
-            "BD".postln();
+        if(buffer.endsWith("P1")) {
+            "P1".postln();
+			~advancePhaseState.value();
             buffer = "";
-        } {
-            if (buffer.endsWith("BU")) {
-                "BU".postln();
-                buffer = "";
-            }
-
         }
     };
 

@@ -1,65 +1,115 @@
-/*
-  Button
-
-  Turns on and off a light emitting diode(LED) connected to digital pin 13,
-  when pressing a pushbutton attached to pin 2.
-
-  The circuit:
-  - LED attached from pin 13 to ground through 220 ohm resistor
-  - pushbutton attached to pin 2 from +5V
-  - 10K resistor attached to pin 2 from ground
-
-  - Note: on most Arduinos there is already an LED on the board
-    attached to pin 13.
-
-  created 2005
-  by DojoDave <http://www.0j0.org>
-  modified 30 Aug 2011
-  by Tom Igoe
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Button
-*/
-
-// constants won't change. They're used here to set pin numbers:
 const int buttonPin = 2;     // the number of the pushbutton pin
-const int ledPin =  13;      // the number of the LED pin
 
-// variables will change:
-int buttonState = 0;         // variable for reading the pushbutton status
+// Time between pressing the button and opening the door
+unsigned long kButtonPressDelayMs = 7000;
+
+// Time between opening the door and closing it
+unsigned long kDoorOpenDurationMs = 0;
+
+// Time between closing the door and the music finishing
+unsigned long kCountdownDurationMs = 60000;
 
 void setup() {
-  // initialize the LED pin as an output:
-  pinMode(ledPin, OUTPUT);
-  // initialize the pushbutton pin as an input:
-  pinMode(buttonPin, INPUT);
+    // initialize the LED pin as an output:
+    // initialize the pushbutton pin as an input:
+    pinMode(buttonPin, INPUT);
 
     // Initialize serial communication at 9600 bits per second:
-  Serial.begin(9600);
+    Serial.begin(9600);
+}
+
+int buttonState = 0;
+int prevButtonState = 0;
+unsigned long now = millis();
+
+/**
+ *  Tracks the current phase
+ *  0 - idle
+ *  1 - button pressed, waiting
+ *  2 - door opened, waiting for phone to fall
+ *  3 - door closed, waiting for waiting music to finish
+ **/
+int numPhases = 4;
+int currentPhaseState = 0;
+unsigned long currentPhaseStartTime = 0;
+
+void handlePhaseAdvanced() {
+    switch (currentPhaseState) {
+        case 0:
+            // idle
+            break;
+        case 1:
+            // button pressed, waiting
+
+            // Send sound computer message to move it to P1
+            Serial.println("P1");  
+
+            break;
+        case 2:
+            // door opened, waiting for phone to fall
+
+            // TODO: open servo
+
+            break;
+        case 3:
+            // door closed, waiting for waiting music to finish
+
+            // TODO: close servo
+
+            break;
+    }
+}
+void advancePhase() {
+    currentPhaseState = (currentPhaseState + 1) % numPhases;
+    currentPhaseStartTime = now;
+    handlePhaseAdvanced();
+}
+
+void handleButtonPress() {
+
+    // Button press only does something in the idle state
+    if (currentPhaseState == 0) {
+        advancePhase();
+    }
 
 }
 
-int prevButtonState = 0;
+unsigned long currentPhaseDuration = 0;
 void loop() {
-  prevButtonState = buttonState;
-  // read the state of the pushbutton value:
-  buttonState = digitalRead(buttonPin);
+    now = millis();
+    prevButtonState = buttonState;
 
-  // check if the pushbutton is pressed. If it is, the buttonState is HIGH:
-  if (buttonState == HIGH) {
-    // turn LED on:
-    digitalWrite(ledPin, HIGH);
-  } else {
-    // turn LED off:
-    digitalWrite(ledPin, LOW);
-  }
+    // read the state of the pushbutton value:
+    buttonState = digitalRead(buttonPin);
 
-  if (prevButtonState != buttonState) {
-    if (buttonState == HIGH) {
-        Serial.println("BD");  
-    } else {
-      Serial.println("BU");
+    if (prevButtonState != buttonState) {
+        if (buttonState == HIGH) {
+            handleButtonPress();
+        }
     }
-  }
+
+    currentPhaseDuration = now - currentPhaseStartTime;
+    switch (currentPhaseState) {
+        case 0:
+            // idle
+            break;
+        case 1:
+            // button pressed, waiting
+            if (currentPhaseDuration > kButtonPressDelayMs) {
+                advancePhase();
+            }
+            break;
+        case 2:
+            // door opened, waiting for phone to fall
+            if (currentPhaseDuration > kDoorOpenDurationMs) {
+                advancePhase();
+            }
+            break;
+        case 3:
+            // door closed, waiting for waiting music to finish
+            if (currentPhaseDuration > kCountdownDurationMs) {
+                advancePhase();
+            }
+            break;
+    }
 }
