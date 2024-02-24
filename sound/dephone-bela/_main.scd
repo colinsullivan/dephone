@@ -98,7 +98,7 @@ s.waitForBoot {
 				~musicPlayer.free;
 			});
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-            ~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \shouldLoop, 1, \amp, -4.dbamp()], s);
+            ~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \shouldLoop, 1, \amp, -13.dbamp()], s);
         });
 
         if(~experiencePhase == 1, {
@@ -124,13 +124,13 @@ s.waitForBoot {
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
 			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \amp, -4.0.dbamp()], s);
 
-            TempoClock.default.sched((beatsPerBar * 8).rand(beatsPerBar * 12), {
+            TempoClock.default.sched((beatsPerBar * 2) + rand(beatsPerBar * 4), {
                 ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
-                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0, \amp, -3.0.dbamp()], s);
+                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0, \amp, -1.0.dbamp()], s);
             });
-            TempoClock.default.sched((beatsPerBar * 28).rand(beatsPerBar * 36), {
+            TempoClock.default.sched((beatsPerBar * 16) + rand(beatsPerBar * 4), {
                 ~voice2Buf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
-                ~voice2Player = Synth.new("stream-buf", [\bufnum, ~voice2Buf, \shouldLoop, 0, -3.0.dbamp()], s);
+                ~voice2Player = Synth.new("stream-buf", [\bufnum, ~voice2Buf, \shouldLoop, 0, -1.0.dbamp()], s);
             });
 
 

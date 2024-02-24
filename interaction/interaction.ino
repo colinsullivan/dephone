@@ -8,10 +8,10 @@ const int buttonPin = 8;     // the number of the pushbutton pin
 const int ledPin =  10;      // the number of the LED pin
 
 // Time between pressing the button and opening the door
-unsigned long kButtonPressDelayMs = 7000;
+unsigned long kButtonPressDelayMs = 6500;
 
 // Time between opening the door and closing it
-unsigned long kDoorOpenDurationMs = 1000;
+unsigned long kDoorOpenDurationMs = 500;
 
 // Time between closing the door and the music finishing
 /*unsigned long kCountdownDurationMs = 60000;*/

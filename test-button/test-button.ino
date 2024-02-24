@@ -50,4 +50,6 @@ void loop() {
     digitalWrite(ledPin, LOW);
     Serial.println("LOW");
   }
+  Serial.println("loop");
+  delay(500);
 }
