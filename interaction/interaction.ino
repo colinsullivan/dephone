@@ -1,8 +1,11 @@
 #include <Servo.h>
 
 Servo myservo;  // create servo object to control a servo
+int kServoOpenValue = 1000;
+int kServoCloseValue = 2400;
 
-const int buttonPin = 2;     // the number of the pushbutton pin
+const int buttonPin = 8;     // the number of the pushbutton pin
+const int ledPin =  10;      // the number of the LED pin
 
 // Time between pressing the button and opening the door
 unsigned long kButtonPressDelayMs = 7000;
@@ -11,17 +14,22 @@ unsigned long kButtonPressDelayMs = 7000;
 unsigned long kDoorOpenDurationMs = 1000;
 
 // Time between closing the door and the music finishing
-unsigned long kCountdownDurationMs = 60000;
+/*unsigned long kCountdownDurationMs = 60000;*/
+unsigned long kCountdownDurationMs = 10000;
 
 void setup() {
     // initialize the LED pin as an output:
     // initialize the pushbutton pin as an input:
     pinMode(buttonPin, INPUT_PULLUP);
+    // initialize the LED pin as an output:
+  pinMode(ledPin, OUTPUT);
 
     myservo.attach(9);
 
     // Initialize serial communication at 9600 bits per second:
     Serial.begin(9600);
+
+    myservo.writeMicroseconds(kServoCloseValue);
 }
 
 int buttonState = 0;
@@ -55,13 +63,13 @@ void handlePhaseAdvanced() {
             // door opened, waiting for phone to fall
 
             // opens servo
-            myservo.writeMicroseconds(1900);
+            myservo.writeMicroseconds(kServoOpenValue);
 
             break;
         case 3:
             // door closed, waiting for waiting music to finish
             // closes servo
-            myservo.writeMicroseconds(2400);
+            myservo.writeMicroseconds(kServoCloseValue);
 
             break;
     }
@@ -73,6 +81,8 @@ void advancePhase() {
 }
 
 void handleButtonPress() {
+    // turn LED on:
+    digitalWrite(ledPin, HIGH);
 
     // Button press only does something in the idle state
     if (currentPhaseState == 0) {
