@@ -21,8 +21,8 @@ s.options.numOutputBusChannels = 2;
 /**
  *  Config
  **/
- ~soundDir = "/root/Bela/projects/dephone-sounds";
-//~soundDir = "/Users/colin/Projects/dephone/sound";
+// ~soundDir = "/root/Bela/projects/dephone-sounds";
+~soundDir = "/Users/colin/Projects/dephone/sound";
 
 SerialPort.devices().postln();
 ~portName = "/dev/ttyACM0";
@@ -80,12 +80,12 @@ s.waitForBoot {
      *  Set up synths
      **/
     SynthDef("stream-buf", {
-        arg out = 0, bufnum, shouldLoop = 0;
+        arg out = 0, bufnum, shouldLoop = 0, amp = 1.0;
 
         Out.ar(
             out,
             DiskIn.ar(2, bufnum, loop: shouldLoop)
-        );
+        ) * amp;
     }).add;
 
     /**
@@ -122,17 +122,18 @@ s.waitForBoot {
                 ~musicPlayer.free;
             });
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf], s);
+			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \amp, -4.0.dbamp()], s);
 
-            TempoClock.default.sched((beatsPerBar * 4).rand(beatsPerBar * 12), {
+            TempoClock.default.sched((beatsPerBar * 8).rand(beatsPerBar * 12), {
                 ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
-                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0], s);
+                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0, \amp, -3.0.dbamp()], s);
+            });
+            TempoClock.default.sched((beatsPerBar * 28).rand(beatsPerBar * 36), {
+                ~voice2Buf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
+                ~voice2Player = Synth.new("stream-buf", [\bufnum, ~voice2Buf, \shouldLoop, 0, -3.0.dbamp()], s);
             });
 
-            TempoClock.default.sched((beatsPerBar * 24).rand(beatsPerBar * 32), {
-                ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
-                ~voicePlayer = Synth.new("stream-buf", [\bufnum, ~voiceBuf, \shouldLoop, 0], s);
-            });
+
 
 			// schedule transition to next phase in 41 bars
 			TempoClock.default.sched(41 * beatsPerBar, {
