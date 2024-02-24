@@ -2,7 +2,7 @@
 
 Servo myservo;  // create servo object to control a servo
 int kServoOpenValue = 1000;
-int kServoCloseValue = 2400;
+int kServoCloseValue = 2150;
 
 const int buttonPin = 8;     // the number of the pushbutton pin
 const int ledPin =  10;      // the number of the LED pin
