@@ -1,10 +1,14 @@
+#include <Servo.h>
+
+Servo myservo;  // create servo object to control a servo
+
 const int buttonPin = 2;     // the number of the pushbutton pin
 
 // Time between pressing the button and opening the door
 unsigned long kButtonPressDelayMs = 7000;
 
 // Time between opening the door and closing it
-unsigned long kDoorOpenDurationMs = 0;
+unsigned long kDoorOpenDurationMs = 1000;
 
 // Time between closing the door and the music finishing
 unsigned long kCountdownDurationMs = 60000;
@@ -13,6 +17,8 @@ void setup() {
     // initialize the LED pin as an output:
     // initialize the pushbutton pin as an input:
     pinMode(buttonPin, INPUT_PULLUP);
+
+    myservo.attach(9);
 
     // Initialize serial communication at 9600 bits per second:
     Serial.begin(9600);
@@ -48,13 +54,14 @@ void handlePhaseAdvanced() {
         case 2:
             // door opened, waiting for phone to fall
 
-            // TODO: open servo
+            // opens servo
+            myservo.writeMicroseconds(1900);
 
             break;
         case 3:
             // door closed, waiting for waiting music to finish
-
-            // TODO: close servo
+            // closes servo
+            myservo.writeMicroseconds(2400);
 
             break;
     }
