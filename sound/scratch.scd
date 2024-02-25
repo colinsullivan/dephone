@@ -76,3 +76,11 @@ var buffer = "";
 (
 ~advancePhaseState.value();
 )
+
+(
+["one", "two"].choose()
+)
+
+(
+10 + rand(20)
+)

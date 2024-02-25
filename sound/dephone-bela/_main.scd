@@ -58,6 +58,8 @@ SerialPort.devices().postln();
     "voices-rendered-07 [2024-02-23 200945].aif",
 ];
 
+~voiceFinishedSound = "voices-rendered-finished [2024-02-24 180235].aif";
+
 
 s.waitForBoot {
 	var buffer = "";
@@ -84,8 +86,8 @@ s.waitForBoot {
 
         Out.ar(
             out,
-            DiskIn.ar(2, bufnum, loop: shouldLoop)
-        ) * amp;
+            DiskIn.ar(2, bufnum, loop: shouldLoop) * amp
+        );
     }).add;
 
     /**
@@ -94,11 +96,14 @@ s.waitForBoot {
     ~handlePhaseAdvanced = {
 		~experiencePhase.postln();
         if(~experiencePhase == 0, {
-			if (~musicPlayer.isNil == false, {
-				~musicPlayer.free;
+			if (~introPlayer.isNil == false, {
+				~introPlayer.free;
 			});
-			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-            ~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \shouldLoop, 1, \amp, -13.dbamp()], s);
+			if(~musicPlayer.isNil == false, {
+				~musicPlayer.free
+			});
+			~introBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
+            ~introPlayer = Synth.new("stream-buf", [\bufnum, ~introBuf, \shouldLoop, 1, \amp, -10.dbamp()], s);
         });
 
         if(~experiencePhase == 1, {
@@ -107,6 +112,9 @@ s.waitForBoot {
 			});
 			if(~musicPlayer.isNil == false, {
 				~musicPlayer.free
+			});
+			if (~introPlayer.isNil == false, {
+				~introPlayer.free;
 			});
 			~transitionBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
             ~transitionPlayer = Synth.new("stream-buf", [\bufnum, ~transitionBuf, \shouldLoop, 0], s);
@@ -118,11 +126,14 @@ s.waitForBoot {
         });
 
         if(~experiencePhase == 2, {
-            if (~musicPlayer.isNil == false, {
-                ~musicPlayer.free;
-            });
+			if(~musicPlayer.isNil == false, {
+				~musicPlayer.free
+			});
+			if (~introPlayer.isNil == false, {
+				~introPlayer.free;
+			});
 			~musicBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~experienceSoundsByPhase[~experiencePhase].choose(), 0, 2);
-			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \amp, -4.0.dbamp()], s);
+			~musicPlayer = Synth.new("stream-buf", [\bufnum, ~musicBuf, \amp, -1.0.dbamp()], s);
 
             TempoClock.default.sched((beatsPerBar * 2) + rand(beatsPerBar * 4), {
                 ~voiceBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceSounds.choose(), 0, 2);
@@ -133,10 +144,14 @@ s.waitForBoot {
                 ~voice2Player = Synth.new("stream-buf", [\bufnum, ~voice2Buf, \shouldLoop, 0, -1.0.dbamp()], s);
             });
 
-
+            // schedule finished voice in 41 bars
+            TempoClock.default.sched(41 * beatsPerBar, {
+                ~voiceFinishedBuf = Buffer.cueSoundFile(s, ~soundDir +/+ "renders" +/+ ~voiceFinishedSound, 0, 2);
+                ~voiceFinishedPlayer = Synth.new("stream-buf", [\bufnum, ~voiceFinishedBuf, \shouldLoop, 0, \amp, -1.0.dbamp()], s);
+            });
 
 			// schedule transition to next phase in 41 bars
-			TempoClock.default.sched(41 * beatsPerBar, {
+			TempoClock.default.sched(43 * beatsPerBar, {
 				~advancePhaseState.value();
 			});
 
