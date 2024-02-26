@@ -2,7 +2,7 @@
 
 Servo myservo;  // create servo object to control a servo
 int kServoOpenValue = 1000;
-int kServoCloseValue = 2250;
+int kServoCloseValue = 2150;
 
 const int buttonPin = 8;     // the number of the pushbutton pin
 const int ledPin =  10;      // the number of the LED pin
@@ -17,8 +17,7 @@ unsigned long kButtonPressDelayMs = 6500;
 unsigned long kDoorOpenDurationMs = 500;
 
 // Time between closing the door and the music finishing
-/*unsigned long kCountdownDurationMs = 60000;*/
-unsigned long kCountdownDurationMs = 10000;
+unsigned long kCountdownDurationMs = 61000;
 
 void setup() {
     // initialize the LED pin as an output:
